@@ -5,7 +5,7 @@ API REST de um e-commerce simplificado (usuários, pedidos, itens, produtos, cat
 > Projeto de estudo. Este repositório é uma **versão adaptada** do projeto do curso "Java COMPLETO" (Udemy). Veja a seção [Origem e créditos](#origem-e-créditos).
 
 ## Status
-Em desenvolvimento. Fase atual: fundação do projeto (Dia 1). Hoje a API responde `GET /users` com um dado fixo; a persistência chega nas próximas fases.
+Em desenvolvimento. Fase atual: persistência e casos de uso (Dia 2). Hoje a API lista e busca usuários por id, lendo do H2 (perfil `test`, com dados de exemplo carregados na inicialização). Pedidos, produtos, pagamentos e o CRUD completo chegam nas próximas fases.
 
 ## Stack
 - Java 21
@@ -37,7 +37,8 @@ Pré-requisitos: JDK 21 ou superior e Maven (o projeto inclui o Maven Wrapper).
 
 O perfil `test` (H2 em memória) é o padrão por enquanto. A aplicação sobe em `http://localhost:8080`:
 
-- `GET /users`: lista de usuários (dado fixo nesta fase)
+- `GET /users`: lista de usuários
+- `GET /users/{id}`: busca um usuário por id (404 se não existir)
 - `/h2-console`: console do H2 (URL `jdbc:h2:mem:testdb`, usuário `sa`, senha vazia)
 
 Para rodar os testes:
