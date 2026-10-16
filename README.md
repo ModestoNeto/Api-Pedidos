@@ -5,7 +5,9 @@ API REST de um e-commerce simplificado (usuários, pedidos, itens, produtos, cat
 > Projeto de estudo. Este repositório é uma **versão adaptada** do projeto do curso "Java COMPLETO" (Udemy). Veja a seção [Origem e créditos](#origem-e-créditos).
 
 ## Status
-Em desenvolvimento. Fase atual: catálogo de produtos e categorias (Dia 4). Hoje a API lista e busca usuários, pedidos, produtos e categorias por id, lendo do H2 (perfil `test`, com dados de exemplo carregados na inicialização). Os pedidos trazem o cliente, o status e a data em ISO 8601, e os produtos trazem suas categorias (associação muitos-para-muitos). Itens do pedido, pagamentos e o CRUD completo chegam nas próximas fases.
+Em desenvolvimento. Fase atual: itens do pedido e pagamento (Dia 5). Hoje a API lista e busca usuários, pedidos, produtos e categorias por id, lendo do H2 (perfil `test`, com dados de exemplo carregados na inicialização). Os pedidos trazem o cliente, o status, a data em ISO 8601, os itens, o pagamento (quando houver) e o total, e os produtos trazem suas categorias (associação muitos-para-muitos). O CRUD completo de usuários, o tratamento de erros e o banco MySQL chegam nas próximas fases.
+
+Valores monetários usam `Double`, como no curso de referência. Isso é aceitável para estudo, mas em um sistema real o correto é `BigDecimal`, por causa de arredondamento.
 
 ## Stack
 - Java 21
@@ -39,8 +41,8 @@ O perfil `test` (H2 em memória) é o padrão por enquanto. A aplicação sobe e
 
 - `GET /users`: lista de usuários
 - `GET /users/{id}`: busca um usuário por id (404 se não existir)
-- `GET /orders`: lista de pedidos, com cliente e status
-- `GET /orders/{id}`: busca um pedido por id (404 se não existir)
+- `GET /orders`: lista de pedidos, com cliente, status, itens, pagamento e total
+- `GET /orders/{id}`: busca um pedido por id, com itens, pagamento (`null` se não pago) e total (404 se não existir)
 - `GET /products`: lista de produtos, com suas categorias
 - `GET /products/{id}`: busca um produto por id (404 se não existir)
 - `GET /categories`: lista de categorias
