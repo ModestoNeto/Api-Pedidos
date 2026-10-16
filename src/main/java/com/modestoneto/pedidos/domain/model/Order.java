@@ -2,6 +2,8 @@ package com.modestoneto.pedidos.domain.model;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.modestoneto.pedidos.domain.model.enums.OrderStatus;
@@ -13,6 +15,8 @@ public class Order implements Serializable {
 	private Instant moment;
 	private OrderStatus orderStatus;
 	private User client;
+	private Payment payment;
+	private List<OrderItem> items = new ArrayList<>();
 
 	public Order() {
 	}
@@ -54,6 +58,26 @@ public class Order implements Serializable {
 
 	public void setClient(User client) {
 		this.client = client;
+	}
+
+	public Payment getPayment() {
+		return payment;
+	}
+
+	public void setPayment(Payment payment) {
+		this.payment = payment;
+	}
+
+	public List<OrderItem> getItems() {
+		return items;
+	}
+
+	public Double getTotal() {
+		double sum = 0.0;
+		for (OrderItem item : items) {
+			sum += item.getSubTotal();
+		}
+		return sum;
 	}
 
 	@Override

@@ -5,7 +5,7 @@ API REST de um e-commerce simplificado (usuários, pedidos, itens, produtos, cat
 > Projeto de estudo. Este repositório é uma **versão adaptada** do projeto do curso "Java COMPLETO" (Udemy). Veja a seção [Origem e créditos](#origem-e-créditos).
 
 ## Status
-Em desenvolvimento. Fase atual: pedidos e status (Dia 3). Hoje a API lista e busca usuários e pedidos por id, lendo do H2 (perfil `test`, com dados de exemplo carregados na inicialização). Os pedidos trazem o cliente, o status e a data em ISO 8601. Produtos, categorias, itens, pagamentos e o CRUD completo chegam nas próximas fases.
+Em desenvolvimento. Fase atual: catálogo de produtos e categorias (Dia 4). Hoje a API lista e busca usuários, pedidos, produtos e categorias por id, lendo do H2 (perfil `test`, com dados de exemplo carregados na inicialização). Os pedidos trazem o cliente, o status e a data em ISO 8601, e os produtos trazem suas categorias (associação muitos-para-muitos). Itens do pedido, pagamentos e o CRUD completo chegam nas próximas fases.
 
 ## Stack
 - Java 21
@@ -41,6 +41,10 @@ O perfil `test` (H2 em memória) é o padrão por enquanto. A aplicação sobe e
 - `GET /users/{id}`: busca um usuário por id (404 se não existir)
 - `GET /orders`: lista de pedidos, com cliente e status
 - `GET /orders/{id}`: busca um pedido por id (404 se não existir)
+- `GET /products`: lista de produtos, com suas categorias
+- `GET /products/{id}`: busca um produto por id (404 se não existir)
+- `GET /categories`: lista de categorias
+- `GET /categories/{id}`: busca uma categoria por id (404 se não existir)
 - `/h2-console`: console do H2 (URL `jdbc:h2:mem:testdb`, usuário `sa`, senha vazia)
 
 Para rodar os testes:
