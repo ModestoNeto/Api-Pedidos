@@ -2,7 +2,9 @@ package com.modestoneto.pedidos.adapter.out.persistence;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,6 +29,9 @@ public class OrderJpaEntity implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "client_id")
 	private UserJpaEntity client;
+
+	@OneToMany(mappedBy = "id.order")
+	private Set<OrderItemJpaEntity> items = new HashSet<>();
 
 	public OrderJpaEntity() {
 	}
@@ -67,6 +73,10 @@ public class OrderJpaEntity implements Serializable {
 
 	public void setClient(UserJpaEntity client) {
 		this.client = client;
+	}
+
+	public Set<OrderItemJpaEntity> getItems() {
+		return items;
 	}
 
 	@Override
