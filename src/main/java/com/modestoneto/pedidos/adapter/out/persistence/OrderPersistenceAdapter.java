@@ -15,14 +15,16 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort {
 
 	private final SpringDataOrderRepository repository;
 	private final SpringDataOrderItemRepository itemRepository;
+	private final SpringDataPaymentRepository paymentRepository;
 	private final SpringDataProductRepository productRepository;
 	private final OrderMapper mapper;
 
 	public OrderPersistenceAdapter(SpringDataOrderRepository repository,
-			SpringDataOrderItemRepository itemRepository, SpringDataProductRepository productRepository,
-			OrderMapper mapper) {
+			SpringDataOrderItemRepository itemRepository, SpringDataPaymentRepository paymentRepository,
+			SpringDataProductRepository productRepository, OrderMapper mapper) {
 		this.repository = repository;
 		this.itemRepository = itemRepository;
+		this.paymentRepository = paymentRepository;
 		this.productRepository = productRepository;
 		this.mapper = mapper;
 	}
@@ -48,6 +50,14 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort {
 			OrderItemJpaEntity savedItem = itemRepository
 					.save(new OrderItemJpaEntity(saved, product, item.getQuantity(), item.getPrice()));
 			saved.getItems().add(savedItem);
+		}
+		if (order.getPayment() != null) {
+			// Com @MapsId, o Hibernate copia o id do pedido para o pagamento; por isso o id
+			// fica nulo na criação.
+			PaymentJpaEntity payment = paymentRepository.findById(saved.getId())
+					.orElseGet(() -> new PaymentJpaEntity(null, null, saved));
+			payment.setMoment(order.getPayment().getMoment());
+			saved.setPayment(paymentRepository.save(payment));
 		}
 		return mapper.toDomain(saved);
 	}

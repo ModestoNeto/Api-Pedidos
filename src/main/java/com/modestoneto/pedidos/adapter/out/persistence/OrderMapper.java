@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.modestoneto.pedidos.domain.model.Order;
 import com.modestoneto.pedidos.domain.model.OrderItem;
+import com.modestoneto.pedidos.domain.model.Payment;
 import com.modestoneto.pedidos.domain.model.enums.OrderStatus;
 
 @Component
@@ -24,12 +25,15 @@ public class OrderMapper {
 			order.getItems()
 					.add(new OrderItem(productMapper.toDomain(item.getProduct()), item.getQuantity(), item.getPrice()));
 		}
+		if (entity.getPayment() != null) {
+			order.setPayment(new Payment(entity.getPayment().getId(), entity.getPayment().getMoment()));
+		}
 		return order;
 	}
 
 	/**
-	 * Converte só os dados do pedido. Os itens são gravados à parte pelo adaptador,
-	 * depois que o pedido tem id.
+	 * Converte só os dados do pedido. Os itens e o pagamento são gravados à parte
+	 * pelo adaptador, depois que o pedido tem id.
 	 */
 	public OrderJpaEntity toEntity(Order order) {
 		return new OrderJpaEntity(order.getId(), order.getMoment(), order.getOrderStatus().getCode(),

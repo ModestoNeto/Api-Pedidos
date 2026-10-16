@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -32,6 +33,9 @@ public class OrderJpaEntity implements Serializable {
 
 	@OneToMany(mappedBy = "id.order")
 	private Set<OrderItemJpaEntity> items = new HashSet<>();
+
+	@OneToOne(mappedBy = "order")
+	private PaymentJpaEntity payment;
 
 	public OrderJpaEntity() {
 	}
@@ -77,6 +81,14 @@ public class OrderJpaEntity implements Serializable {
 
 	public Set<OrderItemJpaEntity> getItems() {
 		return items;
+	}
+
+	public PaymentJpaEntity getPayment() {
+		return payment;
+	}
+
+	public void setPayment(PaymentJpaEntity payment) {
+		this.payment = payment;
 	}
 
 	@Override
