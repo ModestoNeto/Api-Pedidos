@@ -42,6 +42,13 @@ public class OrderController {
 		User client = order.getClient();
 		UserResponse clientResponse = new UserResponse(client.getId(), client.getName(), client.getEmail(),
 				client.getPhone());
-		return new OrderResponse(order.getId(), order.getMoment(), order.getOrderStatus().name(), clientResponse);
+		List<OrderItemResponse> items = order.getItems().stream()
+				.map(item -> new OrderItemResponse(item.getProduct().getId(), item.getProduct().getName(),
+						item.getPrice(), item.getQuantity(), item.getSubTotal()))
+				.toList();
+		PaymentResponse payment = order.getPayment() == null ? null
+				: new PaymentResponse(order.getPayment().getId(), order.getPayment().getMoment());
+		return new OrderResponse(order.getId(), order.getMoment(), order.getOrderStatus().name(), clientResponse,
+				items, payment, order.getTotal());
 	}
 }
