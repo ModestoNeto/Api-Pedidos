@@ -1,7 +1,6 @@
 package com.modestoneto.pedidos.application.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -11,6 +10,7 @@ import com.modestoneto.pedidos.application.port.in.FindUserByIdUseCase;
 import com.modestoneto.pedidos.application.port.in.FindUsersUseCase;
 import com.modestoneto.pedidos.application.port.in.UpdateUserUseCase;
 import com.modestoneto.pedidos.application.port.out.UserRepositoryPort;
+import com.modestoneto.pedidos.domain.exception.ResourceNotFoundException;
 import com.modestoneto.pedidos.domain.model.User;
 
 @Service
@@ -29,8 +29,9 @@ public class UserService implements FindUsersUseCase, FindUserByIdUseCase, Creat
 	}
 
 	@Override
-	public Optional<User> findById(Long id) {
-		return userRepository.findById(id);
+	public User findById(Long id) {
+		return userRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado: id " + id));
 	}
 
 	@Override
@@ -40,21 +41,17 @@ public class UserService implements FindUsersUseCase, FindUserByIdUseCase, Creat
 	}
 
 	@Override
-	public Optional<User> update(Long id, User data) {
-		return userRepository.findById(id).map(user -> {
-			user.setName(data.getName());
-			user.setEmail(data.getEmail());
-			user.setPhone(data.getPhone());
-			return userRepository.save(user);
-		});
+	public User update(Long id, User data) {
+		User user = findById(id);
+		user.setName(data.getName());
+		user.setEmail(data.getEmail());
+		user.setPhone(data.getPhone());
+		return userRepository.save(user);
 	}
 
 	@Override
-	public boolean delete(Long id) {
-		if (userRepository.findById(id).isEmpty()) {
-			return false;
-		}
+	public void delete(Long id) {
+		findById(id);
 		userRepository.deleteById(id);
-		return true;
 	}
 }

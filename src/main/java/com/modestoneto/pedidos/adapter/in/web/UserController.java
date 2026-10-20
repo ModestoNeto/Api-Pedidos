@@ -50,9 +50,7 @@ public class UserController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
-		return findUserById.findById(id)
-				.map(user -> ResponseEntity.ok(toResponse(user)))
-				.orElse(ResponseEntity.notFound().build());
+		return ResponseEntity.ok(toResponse(findUserById.findById(id)));
 	}
 
 	@PostMapping
@@ -68,17 +66,13 @@ public class UserController {
 	public ResponseEntity<UserResponse> update(@PathVariable Long id,
 			@Valid @RequestBody UpdateUserRequest request) {
 		User data = new User(null, request.name(), request.email(), request.phone(), null);
-		return updateUser.update(id, data)
-				.map(user -> ResponseEntity.ok(toResponse(user)))
-				.orElse(ResponseEntity.notFound().build());
+		return ResponseEntity.ok(toResponse(updateUser.update(id, data)));
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		if (deleteUser.delete(id)) {
-			return ResponseEntity.noContent().build();
-		}
-		return ResponseEntity.notFound().build();
+		deleteUser.delete(id);
+		return ResponseEntity.noContent().build();
 	}
 
 	private UserResponse toResponse(User user) {

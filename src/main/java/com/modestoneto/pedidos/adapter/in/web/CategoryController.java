@@ -32,9 +32,7 @@ public class CategoryController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<CategoryResponse> findById(@PathVariable Long id) {
-		return findCategoryById.findById(id)
-				.map(category -> ResponseEntity.ok(toResponse(category)))
-				.orElse(ResponseEntity.notFound().build());
+		return ResponseEntity.ok(toResponse(findCategoryById.findById(id)));
 	}
 
 	private CategoryResponse toResponse(Category category) {

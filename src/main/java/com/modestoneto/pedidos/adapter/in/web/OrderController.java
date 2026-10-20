@@ -33,9 +33,7 @@ public class OrderController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<OrderResponse> findById(@PathVariable Long id) {
-		return findOrderById.findById(id)
-				.map(order -> ResponseEntity.ok(toResponse(order)))
-				.orElse(ResponseEntity.notFound().build());
+		return ResponseEntity.ok(toResponse(findOrderById.findById(id)));
 	}
 
 	private OrderResponse toResponse(Order order) {

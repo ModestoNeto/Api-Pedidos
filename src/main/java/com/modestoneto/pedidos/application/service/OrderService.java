@@ -1,13 +1,13 @@
 package com.modestoneto.pedidos.application.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.modestoneto.pedidos.application.port.in.FindOrderByIdUseCase;
 import com.modestoneto.pedidos.application.port.in.FindOrdersUseCase;
 import com.modestoneto.pedidos.application.port.out.OrderRepositoryPort;
+import com.modestoneto.pedidos.domain.exception.ResourceNotFoundException;
 import com.modestoneto.pedidos.domain.model.Order;
 
 @Service
@@ -25,7 +25,8 @@ public class OrderService implements FindOrdersUseCase, FindOrderByIdUseCase {
 	}
 
 	@Override
-	public Optional<Order> findById(Long id) {
-		return orderRepository.findById(id);
+	public Order findById(Long id) {
+		return orderRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Pedido não encontrado: id " + id));
 	}
 }

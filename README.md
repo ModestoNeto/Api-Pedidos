@@ -5,13 +5,12 @@ API REST de um e-commerce simplificado (usuários, pedidos, itens, produtos, cat
 > Projeto de estudo. Este repositório é uma **versão adaptada** do projeto do curso "Java COMPLETO" (Udemy). Veja a seção [Origem e créditos](#origem-e-créditos).
 
 ## Status
-Em desenvolvimento. Fase atual: CRUD de usuários (Dia 6). Hoje a API lista e busca usuários, pedidos, produtos e categorias por id, lendo do H2 (perfil `test`, com dados de exemplo carregados na inicialização). Os usuários podem ser criados, atualizados e removidos, com validação da entrada. Os pedidos trazem o cliente, o status, a data em ISO 8601, os itens, o pagamento (quando houver) e o total, e os produtos trazem suas categorias (associação muitos-para-muitos). O tratamento padronizado de erros e o banco MySQL chegam nas próximas fases.
+Em desenvolvimento. Fase atual: tratamento de exceções (Dia 7). Hoje a API lista e busca usuários, pedidos, produtos e categorias por id, lendo do H2 (perfil `test`, com dados de exemplo carregados na inicialização). Os usuários podem ser criados, atualizados e removidos, com validação da entrada. Os pedidos trazem o cliente, o status, a data em ISO 8601, os itens, o pagamento (quando houver) e o total, e os produtos trazem suas categorias (associação muitos-para-muitos). Os erros seguem um formato único, com os códigos HTTP corretos (400, 404 e 409). O banco MySQL, as migrações e a documentação OpenAPI chegam nas próximas fases.
 
 ### Limitações conhecidas
 - **Valores monetários** usam `Double`, como no curso de referência. Isso é aceitável para estudo, mas em um sistema real o correto é `BigDecimal`, por causa de arredondamento.
 - **Senhas** são gravadas em texto puro. O projeto não usa Spring Security nem criptografia, e a senha nunca é devolvida pela API. Em um sistema real seria obrigatório gravar apenas um hash.
-- **Remover um usuário que tem pedidos** ainda falha com erro 500 (violação de chave estrangeira). O tratamento correto, com resposta 409, é da fase de tratamento de exceções.
-- **Respostas de erro** (404 sem corpo e 400 no formato padrão do Spring) ainda não seguem um formato próprio.
+- **Erros inesperados** (por exemplo, uma falha de banco que não seja de integridade) ainda caem no tratamento padrão do Spring, com resposta 500, e não no formato próprio descrito abaixo.
 
 ## Stack
 - Java 21
@@ -47,7 +46,7 @@ O perfil `test` (H2 em memória) é o padrão por enquanto. A aplicação sobe e
 - `GET /users/{id}`: busca um usuário por id (404 se não existir)
 - `POST /users`: cria um usuário (201, com o header `Location`; 400 se `name`, `email` ou `password` forem inválidos)
 - `PUT /users/{id}`: atualiza `name`, `email` e `phone` (a senha não muda; 404 se não existir; 400 se inválido)
-- `DELETE /users/{id}`: remove um usuário (204; 404 se não existir)
+- `DELETE /users/{id}`: remove um usuário (204; 404 se não existir; 409 se o usuário tiver pedidos)
 - `GET /orders`: lista de pedidos, com cliente, status, itens, pagamento e total
 - `GET /orders/{id}`: busca um pedido por id, com itens, pagamento (`null` se não pago) e total (404 se não existir)
 - `GET /products`: lista de produtos, com suas categorias
@@ -55,6 +54,27 @@ O perfil `test` (H2 em memória) é o padrão por enquanto. A aplicação sobe e
 - `GET /categories`: lista de categorias
 - `GET /categories/{id}`: busca uma categoria por id (404 se não existir)
 - `/h2-console`: console do H2 (URL `jdbc:h2:mem:testdb`, usuário `sa`, senha vazia)
+
+### Formato dos erros
+Todos os erros tratados voltam no mesmo formato:
+
+```json
+{
+  "timestamp": "2026-10-20T18:56:52Z",
+  "status": 404,
+  "error": "Recurso não encontrado",
+  "message": "Usuário não encontrado: id 999",
+  "path": "/users/999"
+}
+```
+
+| Status | Quando acontece |
+|---|---|
+| 400 | Dados de entrada inválidos, corpo da requisição ilegível ou id com tipo errado (por exemplo `/users/abc`) |
+| 404 | O id pedido não existe |
+| 409 | Remover um usuário que tem pedidos |
+
+As exceções (`ResourceNotFoundException` e `ConflictException`) ficam no domínio e não conhecem HTTP. Um `@ControllerAdvice` no adaptador web as traduz para os códigos acima, e o adaptador de persistência converte a violação de integridade do banco em `ConflictException`.
 
 Para rodar os testes:
 
