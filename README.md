@@ -5,9 +5,13 @@ API REST de um e-commerce simplificado (usuários, pedidos, itens, produtos, cat
 > Projeto de estudo. Este repositório é uma **versão adaptada** do projeto do curso "Java COMPLETO" (Udemy). Veja a seção [Origem e créditos](#origem-e-créditos).
 
 ## Status
-Em desenvolvimento. Fase atual: itens do pedido e pagamento (Dia 5). Hoje a API lista e busca usuários, pedidos, produtos e categorias por id, lendo do H2 (perfil `test`, com dados de exemplo carregados na inicialização). Os pedidos trazem o cliente, o status, a data em ISO 8601, os itens, o pagamento (quando houver) e o total, e os produtos trazem suas categorias (associação muitos-para-muitos). O CRUD completo de usuários, o tratamento de erros e o banco MySQL chegam nas próximas fases.
+Em desenvolvimento. Fase atual: CRUD de usuários (Dia 6). Hoje a API lista e busca usuários, pedidos, produtos e categorias por id, lendo do H2 (perfil `test`, com dados de exemplo carregados na inicialização). Os usuários podem ser criados, atualizados e removidos, com validação da entrada. Os pedidos trazem o cliente, o status, a data em ISO 8601, os itens, o pagamento (quando houver) e o total, e os produtos trazem suas categorias (associação muitos-para-muitos). O tratamento padronizado de erros e o banco MySQL chegam nas próximas fases.
 
-Valores monetários usam `Double`, como no curso de referência. Isso é aceitável para estudo, mas em um sistema real o correto é `BigDecimal`, por causa de arredondamento.
+### Limitações conhecidas
+- **Valores monetários** usam `Double`, como no curso de referência. Isso é aceitável para estudo, mas em um sistema real o correto é `BigDecimal`, por causa de arredondamento.
+- **Senhas** são gravadas em texto puro. O projeto não usa Spring Security nem criptografia, e a senha nunca é devolvida pela API. Em um sistema real seria obrigatório gravar apenas um hash.
+- **Remover um usuário que tem pedidos** ainda falha com erro 500 (violação de chave estrangeira). O tratamento correto, com resposta 409, é da fase de tratamento de exceções.
+- **Respostas de erro** (404 sem corpo e 400 no formato padrão do Spring) ainda não seguem um formato próprio.
 
 ## Stack
 - Java 21
@@ -41,6 +45,9 @@ O perfil `test` (H2 em memória) é o padrão por enquanto. A aplicação sobe e
 
 - `GET /users`: lista de usuários
 - `GET /users/{id}`: busca um usuário por id (404 se não existir)
+- `POST /users`: cria um usuário (201, com o header `Location`; 400 se `name`, `email` ou `password` forem inválidos)
+- `PUT /users/{id}`: atualiza `name`, `email` e `phone` (a senha não muda; 404 se não existir; 400 se inválido)
+- `DELETE /users/{id}`: remove um usuário (204; 404 se não existir)
 - `GET /orders`: lista de pedidos, com cliente, status, itens, pagamento e total
 - `GET /orders/{id}`: busca um pedido por id, com itens, pagamento (`null` se não pago) e total (404 se não existir)
 - `GET /products`: lista de produtos, com suas categorias
