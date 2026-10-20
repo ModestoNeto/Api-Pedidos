@@ -4,17 +4,21 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.modestoneto.pedidos.application.port.in.CreateUserUseCase;
+import com.modestoneto.pedidos.application.port.in.DeleteUserUseCase;
 import com.modestoneto.pedidos.application.port.in.FindUserByIdUseCase;
 import com.modestoneto.pedidos.application.port.in.FindUsersUseCase;
+import com.modestoneto.pedidos.application.port.in.UpdateUserUseCase;
 import com.modestoneto.pedidos.domain.model.User;
 
 @RestController
@@ -24,12 +28,16 @@ public class UserController {
 	private final FindUsersUseCase findUsers;
 	private final FindUserByIdUseCase findUserById;
 	private final CreateUserUseCase createUser;
+	private final UpdateUserUseCase updateUser;
+	private final DeleteUserUseCase deleteUser;
 
 	public UserController(FindUsersUseCase findUsers, FindUserByIdUseCase findUserById,
-			CreateUserUseCase createUser) {
+			CreateUserUseCase createUser, UpdateUserUseCase updateUser, DeleteUserUseCase deleteUser) {
 		this.findUsers = findUsers;
 		this.findUserById = findUserById;
 		this.createUser = createUser;
+		this.updateUser = updateUser;
+		this.deleteUser = deleteUser;
 	}
 
 	@GetMapping
@@ -52,6 +60,22 @@ public class UserController {
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(created.getId())
 				.toUri();
 		return ResponseEntity.created(uri).body(toResponse(created));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
+		User data = new User(null, request.name(), request.email(), request.phone(), null);
+		return updateUser.update(id, data)
+				.map(user -> ResponseEntity.ok(toResponse(user)))
+				.orElse(ResponseEntity.notFound().build());
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> delete(@PathVariable Long id) {
+		if (deleteUser.delete(id)) {
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
 	}
 
 	private UserResponse toResponse(User user) {

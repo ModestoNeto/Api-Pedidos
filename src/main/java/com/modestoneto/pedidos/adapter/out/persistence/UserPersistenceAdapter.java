@@ -34,4 +34,9 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
 		UserJpaEntity saved = repository.save(mapper.toEntity(user));
 		return mapper.toDomain(saved);
 	}
+
+	@Override
+	public void deleteById(Long id) {
+		repository.deleteById(id);
+	}
 }
