@@ -1,4 +1,10 @@
 package com.modestoneto.pedidos.adapter.in.web;
 
-public record UpdateUserRequest(String name, String email, String phone) {
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
+public record UpdateUserRequest(
+		@NotBlank String name,
+		@NotBlank @Email String email,
+		String phone) {
 }

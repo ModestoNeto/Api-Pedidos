@@ -21,6 +21,8 @@ import com.modestoneto.pedidos.application.port.in.FindUsersUseCase;
 import com.modestoneto.pedidos.application.port.in.UpdateUserUseCase;
 import com.modestoneto.pedidos.domain.model.User;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -54,7 +56,7 @@ public class UserController {
 	}
 
 	@PostMapping
-	public ResponseEntity<UserResponse> create(@RequestBody CreateUserRequest request) {
+	public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest request) {
 		User user = new User(null, request.name(), request.email(), request.phone(), request.password());
 		User created = createUser.create(user);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(created.getId())
@@ -63,7 +65,8 @@ public class UserController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
+	public ResponseEntity<UserResponse> update(@PathVariable Long id,
+			@Valid @RequestBody UpdateUserRequest request) {
 		User data = new User(null, request.name(), request.email(), request.phone(), null);
 		return updateUser.update(id, data)
 				.map(user -> ResponseEntity.ok(toResponse(user)))
