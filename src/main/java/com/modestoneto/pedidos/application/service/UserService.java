@@ -5,13 +5,14 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.modestoneto.pedidos.application.port.in.CreateUserUseCase;
 import com.modestoneto.pedidos.application.port.in.FindUserByIdUseCase;
 import com.modestoneto.pedidos.application.port.in.FindUsersUseCase;
 import com.modestoneto.pedidos.application.port.out.UserRepositoryPort;
 import com.modestoneto.pedidos.domain.model.User;
 
 @Service
-public class UserService implements FindUsersUseCase, FindUserByIdUseCase {
+public class UserService implements FindUsersUseCase, FindUserByIdUseCase, CreateUserUseCase {
 
 	private final UserRepositoryPort userRepository;
 
@@ -27,5 +28,11 @@ public class UserService implements FindUsersUseCase, FindUserByIdUseCase {
 	@Override
 	public Optional<User> findById(Long id) {
 		return userRepository.findById(id);
+	}
+
+	@Override
+	public User create(User user) {
+		user.setId(null);
+		return userRepository.save(user);
 	}
 }
