@@ -3,9 +3,11 @@ package com.modestoneto.pedidos.adapter.out.persistence;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import com.modestoneto.pedidos.application.port.out.UserRepositoryPort;
+import com.modestoneto.pedidos.domain.exception.ConflictException;
 import com.modestoneto.pedidos.domain.model.User;
 
 @Component
@@ -37,6 +39,10 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
 
 	@Override
 	public void deleteById(Long id) {
-		repository.deleteById(id);
+		try {
+			repository.deleteById(id);
+		} catch (DataIntegrityViolationException e) {
+			throw new ConflictException("Não é possível remover o usuário: ele possui pedidos");
+		}
 	}
 }
