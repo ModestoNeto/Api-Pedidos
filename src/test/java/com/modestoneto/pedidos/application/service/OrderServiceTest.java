@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,16 @@ class OrderServiceTest {
 	void setUp() {
 		repository = mock(OrderRepositoryPort.class);
 		service = new OrderService(repository);
+	}
+
+	@Test
+	void findAllDevolveATodosOsPedidos() {
+		List<Order> orders = List.of(
+				new Order(1L, Instant.parse("2026-10-20T12:00:00Z"), OrderStatus.PAID, null),
+				new Order(2L, Instant.parse("2026-10-21T12:00:00Z"), OrderStatus.WAITING_PAYMENT, null));
+		when(repository.findAll()).thenReturn(orders);
+
+		assertEquals(orders, service.findAll());
 	}
 
 	@Test

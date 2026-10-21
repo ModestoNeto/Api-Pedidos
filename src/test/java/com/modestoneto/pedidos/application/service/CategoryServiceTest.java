@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,14 @@ class CategoryServiceTest {
 	void setUp() {
 		repository = mock(CategoryRepositoryPort.class);
 		service = new CategoryService(repository);
+	}
+
+	@Test
+	void findAllDevolveTodasAsCategorias() {
+		List<Category> categories = List.of(new Category(1L, "Livros"), new Category(2L, "Eletrônicos"));
+		when(repository.findAll()).thenReturn(categories);
+
+		assertEquals(categories, service.findAll());
 	}
 
 	@Test

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,16 @@ class ProductServiceTest {
 	void setUp() {
 		repository = mock(ProductRepositoryPort.class);
 		service = new ProductService(repository);
+	}
+
+	@Test
+	void findAllDevolveATodosOsProdutos() {
+		List<Product> products = List.of(
+				new Product(1L, "Produto A", "Descrição", 10.0, ""),
+				new Product(2L, "Produto B", "Descrição", 20.0, ""));
+		when(repository.findAll()).thenReturn(products);
+
+		assertEquals(products, service.findAll());
 	}
 
 	@Test
