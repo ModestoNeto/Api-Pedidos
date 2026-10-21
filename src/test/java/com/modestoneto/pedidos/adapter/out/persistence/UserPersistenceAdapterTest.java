@@ -7,6 +7,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.modestoneto.pedidos.application.port.out.OrderRepositoryPort;
 import com.modestoneto.pedidos.application.port.out.UserRepositoryPort;
@@ -16,6 +17,7 @@ import com.modestoneto.pedidos.domain.model.User;
 import com.modestoneto.pedidos.domain.model.enums.OrderStatus;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class UserPersistenceAdapterTest {
 
 	@Autowired
