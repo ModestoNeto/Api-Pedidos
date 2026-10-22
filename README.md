@@ -17,6 +17,7 @@ API REST de um e-commerce simplificado (usuários, pedidos, itens, produtos, cat
 - [Testes](#testes)
 - [Decisões técnicas](#decisões-técnicas)
 - [Limitações conhecidas](#limitações-conhecidas)
+- [Possíveis evoluções](#possíveis-evoluções)
 - [Origem e créditos](#origem-e-créditos)
 
 ## O que o projeto faz
@@ -26,7 +27,7 @@ API REST de um e-commerce simplificado (usuários, pedidos, itens, produtos, cat
 - **Erros padronizados:** respostas 400, 404 e 409 em um formato único.
 - **Banco real com migrações:** MySQL em Docker, com esquema e dados de exemplo criados pelo Flyway.
 
-Status: a primeira versão está concluída. Falta apenas a revisão final.
+**Status:** primeira versão concluída (outubro de 2026): arquitetura hexagonal, MySQL com Flyway, testes por camada, testes de arquitetura e documentação Swagger. O que ficou de fora de propósito está em [Possíveis evoluções](#possíveis-evoluções).
 
 ## Stack
 - Java 21
@@ -275,6 +276,16 @@ Assim, a regra de dependência deixa de ser só uma convenção: se alguém impo
 - **Sem autenticação nem autorização:** todos os endpoints são abertos.
 - **Só leitura para pedidos, produtos e categorias:** a API cria, atualiza e remove apenas usuários.
 - **Erros inesperados** (por exemplo, uma falha de banco que não seja de integridade) ainda caem no tratamento padrão do Spring, com resposta 500, e não no formato próprio descrito acima.
+
+## Possíveis evoluções
+Itens que ficaram fora desta versão, em ordem aproximada de importância:
+- **Segurança:** gravar a senha com hash (por exemplo BCrypt) e proteger os endpoints com autenticação (Spring Security, com OAuth2 e JWT).
+- **`BigDecimal`** no lugar de `Double` para os valores monetários.
+- **Escrita em pedidos, produtos e categorias:** hoje só há consulta; faltam criar, atualizar e remover (e, para pedidos, o fluxo de mudança de status e de pagamento).
+- **E-mail único:** uma restrição `UNIQUE` no esquema (com uma nova migração) e a resposta 409 correspondente.
+- **Paginação** nas listagens.
+- **Testcontainers** com MySQL real nos testes de persistência, no lugar do H2, para eliminar a diferença entre os dois bancos.
+- **Integração contínua:** um pipeline (por exemplo GitHub Actions) rodando `mvnw test` a cada push.
 
 ## Origem e créditos
 Este projeto é de estudo e é baseado no curso **"Java COMPLETO"** (Udemy), cujo projeto de referência é uma API de pedidos com Spring Boot e JPA.
