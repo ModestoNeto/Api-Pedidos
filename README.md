@@ -35,7 +35,7 @@ Status: a primeira versão está concluída. Falta apenas a revisão final.
 - MySQL 8 em Docker (padrão) e Flyway para as migrações
 - H2 em memória (perfil `test`, usado nos testes e para rodar sem Docker)
 - springdoc-openapi 3.0.3 (Swagger UI)
-- JUnit 5 e Mockito
+- JUnit 5, Mockito e ArchUnit (testes de arquitetura)
 
 ## Arquitetura
 O projeto segue a **arquitetura hexagonal**: o domínio fica no centro, sem depender de nenhum framework, e tudo o que é externo (HTTP e banco de dados) entra e sai por **portas**, implementadas por **adaptadores**.
@@ -247,8 +247,17 @@ Para rodar uma classe ou um método:
 | Adaptadores de persistência | `@DataJpaTest` (H2) | Gravação e leitura reais: chave composta dos itens, `@MapsId` do pagamento, associação muitos-para-muitos |
 | Conflito na remoção | `@SpringBootTest` | A violação de chave estrangeira vira `ConflictException`. Fica fora do `@DataJpaTest` porque o erro só aparece no commit |
 | Controllers | `@WebMvcTest` (casos de uso simulados) | Status HTTP, corpo, header `Location`, validação e o formato dos erros |
+| Arquitetura | ArchUnit | A regra de dependência da hexagonal (veja abaixo) |
 
 Nos testes de persistência, cada teste roda numa transação desfeita no final, e `flush` e `clear` forçam a ida ao banco antes da leitura, para o teste não ler apenas da memória.
+
+**Testes de arquitetura (`ArchitectureTest`).** Verificam, no código de produção, que:
+- o domínio não depende de `application`, `adapter` nem `config`, e não importa Spring, JPA, Jackson, Swagger nem Hibernate;
+- a aplicação não depende dos adaptadores, nem de JPA, Spring Data, Jackson ou Swagger (o `@Service` do Spring é permitido);
+- o adaptador web e o de persistência não dependem um do outro;
+- os controllers usam só as portas de entrada, sem chamar serviços nem portas de saída diretamente.
+
+Assim, a regra de dependência deixa de ser só uma convenção: se alguém importar Spring no domínio, por exemplo, o `mvnw test` falha.
 
 ## Decisões técnicas
 - **Hexagonal com domínio puro.** As entidades JPA são classes separadas do modelo de domínio, com mappers entre elas. O custo é ter duas classes por conceito; o ganho é um núcleo que não depende de framework e que se testa sem Spring.
@@ -277,6 +286,6 @@ Esta é uma **versão adaptada**, não uma cópia do projeto do curso. Principai
 - **Exceções de domínio e tratamento global de erros** em um formato único.
 - **Spring Boot 4.x**, enquanto o curso foi gravado com Spring Boot 3.
 - **MySQL em Docker e migrações com Flyway**, com o H2 restrito ao perfil de teste.
-- **Testes por camada** e **documentação OpenAPI (Swagger UI)**.
+- **Testes por camada**, **testes de arquitetura (ArchUnit)** e **documentação OpenAPI (Swagger UI)**.
 
 O domínio (usuários, pedidos, itens, produtos, categorias e pagamentos) e os casos de uso seguem o do curso.
