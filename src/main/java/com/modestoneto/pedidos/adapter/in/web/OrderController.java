@@ -8,11 +8,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.modestoneto.pedidos.adapter.in.web.exception.StandardError;
 import com.modestoneto.pedidos.application.port.in.FindOrderByIdUseCase;
 import com.modestoneto.pedidos.application.port.in.FindOrdersUseCase;
 import com.modestoneto.pedidos.domain.model.Order;
 import com.modestoneto.pedidos.domain.model.User;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Pedidos", description = "Consulta de pedidos, com cliente, itens, pagamento e total")
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
@@ -25,12 +33,19 @@ public class OrderController {
 		this.findOrderById = findOrderById;
 	}
 
+	@Operation(summary = "Lista todos os pedidos")
 	@GetMapping
 	public ResponseEntity<List<OrderResponse>> findAll() {
 		List<OrderResponse> list = findOrders.findAll().stream().map(this::toResponse).toList();
 		return ResponseEntity.ok(list);
 	}
 
+	@Operation(summary = "Busca um pedido por id",
+			description = "Traz o cliente, os itens, o pagamento (nulo se o pedido não foi pago) e o total.")
+	@ApiResponse(responseCode = "400", description = "Id com formato inválido",
+			content = @Content(schema = @Schema(implementation = StandardError.class)))
+	@ApiResponse(responseCode = "404", description = "Pedido não encontrado",
+			content = @Content(schema = @Schema(implementation = StandardError.class)))
 	@GetMapping("/{id}")
 	public ResponseEntity<OrderResponse> findById(@PathVariable Long id) {
 		return ResponseEntity.ok(toResponse(findOrderById.findById(id)));
